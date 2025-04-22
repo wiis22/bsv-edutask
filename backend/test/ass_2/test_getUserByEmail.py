@@ -64,5 +64,3 @@ def test_invalid_email(user_controller, invalid_email):
     """Test case for invalid email addresses."""
     with pytest.raises(ValueError):
         user_controller.get_user_by_email(invalid_email)
-
-
