@@ -20,6 +20,8 @@ function TaskCreator(props) {
         data.append('url', url);
         data.append('todos', ['Watch video']);
 
+        console.log("data", data)
+
         // reset the form values
         setTitle("");
         setUrl("");

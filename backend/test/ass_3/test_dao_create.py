@@ -8,9 +8,6 @@ def test_create_video_valid(sut):
     result = sut.create(video_data_valid)
     assert "_id" in result
 
-    # fetched = sut.collection.find_one({"_id": result.inserted_id})
-    # assert fetched["url"] == valid_video_data["url"]
-
 def test_create_video_missing_url(sut):
     video_data_missing_url = {}
     with pytest.raises(errors.WriteError):
