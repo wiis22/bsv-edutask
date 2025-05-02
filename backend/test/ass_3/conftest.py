@@ -9,8 +9,7 @@ from unittest.mock import MagicMock, patch
 def test_db():
     """Fixture to create a test database."""
     client = MongoClient(dotenv_values('.env').get('MONGO_URL'))
-    test_db = client["edutask_test_db"]
-    yield test_db
+    yield client["edutask_test_db"]
     client.drop_database("edutask_test_db")
     client.close()
 
@@ -20,6 +19,5 @@ def sut(test_db):
         mock_client_instance = MagicMock()
         mock_client_instance.edutask = test_db
         mock_client.return_value = mock_client_instance
-        dao_instance = DAO("video")
-        yield dao_instance
+        yield DAO("video")
         test_db.drop_collection("video")
