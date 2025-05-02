@@ -9,11 +9,12 @@ instance/
 
 # dependencies
 frontend/node_modules
+*/package-lock.json
 /.pnp
 .pnp.js
 
 
-# misc
+# miscz
 .DS_Store
 .env.local
 .env.development.local
