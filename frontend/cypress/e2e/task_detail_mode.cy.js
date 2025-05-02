@@ -1,4 +1,4 @@
-describe('Creating a new task', () => {
+describe('Task in detail mode', () => {
     // define variables that we need on multiple occasions
     let uid // user id
     let name // name of the user (firstName + ' ' + lastName)
@@ -38,6 +38,7 @@ describe('Creating a new task', () => {
                 taskData = taskData.toString()
 
                 console.log("taskData", taskData)
+                cy.log("taskData", taskData)
 
                 cy.request({
                     method: 'POST',
@@ -185,5 +186,5 @@ describe('Creating a new task', () => {
         // }).then((response) => {
         //   cy.log(response.body)
         // })
-      })
+    })
 })
