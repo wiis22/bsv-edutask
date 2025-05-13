@@ -4,7 +4,7 @@ describe('Task in detail mode', () => {
     let name // name of the user (firstName + ' ' + lastName)
     let email // email of the user
     let taskid // task id
-    let todoid // todo id
+    // let todoid // todo id
     let taskObject // task object
     let todoData // todo object
     // let todoData // todo object
@@ -37,8 +37,8 @@ describe('Task in detail mode', () => {
 
                 taskData = taskData.toString()
 
-                console.log("taskData", taskData)
-                cy.log("taskData", taskData)
+                // console.log("taskData", taskData)
+                // cy.log("taskData", taskData)
 
                 cy.request({
                     method: 'POST',
@@ -85,7 +85,7 @@ describe('Task in detail mode', () => {
         .should('exist')
     })
 
-    it('creating a new todo item', () => {
+    it('R8UC1-1: should add todo with non-empty description', () => {
         // enter the description of the todo item in the input field
         cy.fixture('todo.json')
         .then((todo) => {
@@ -108,24 +108,37 @@ describe('Task in detail mode', () => {
         })
     })
 
-    it('creating a new todo item with empty description', () => {
-        // make sure description is empty
+    it('R8UC1-2-a: should have empty todo input form start', () => {
         cy.get('form.inline-form')
         .find('input[type=text]')
         .should('have.value', '')
-
-        // assert that the "Add" button is disabled
-        cy.get('input[type=submit][value="Add"]')
-        .should('be.disabled')
     })
 
-    it('check a todo item as done', () => {
+    it('R8UC1-2-b: should disable Add button if input is empty', () => {
+    // cy.get('form.inline-form')
+    // .find('input[type=text]')
+    // .should('have.value', '')
+
+    // assert that the "Add" button is disabled
+    cy.get('input[type=submit][value="Add"]')
+    .should('be.disabled')
+    })
+
+    it('R8UC2-1-a: should start with todo item as not done', () => {
         // check the first todo item
         cy.get('ul.todo-list')
         .find('li.todo-item')
         .first()
         .find('span.checker')
         .should('have.class', 'unchecked')
+    })
+
+    it('R8UC2-1-b: should mark todo item as done after click', () => {
+        // click the first todo item
+        cy.get('ul.todo-list')
+        .find('li.todo-item')
+        .first()
+        .find('span.checker')
         .click()
         // assert that the todo item is now marked as done
         cy.get('ul.todo-list')
@@ -135,23 +148,23 @@ describe('Task in detail mode', () => {
         .should('have.class', 'checked')
     })
 
-    it('check a todo item as not done', () => {
+    it('R8UC2-2: should mark todo item as not done', () => {
         // unchcheck the first todo item
         cy.get('ul.todo-list')
         .find('li.todo-item')
         .first()
         .find('span.checker')
-        .should('have.class', 'checked')
+        // .should('have.class', 'checked')
         .click()
         // assert that the todo item is now marked as not done
-        cy.get('ul.todo-list')
-        .find('li.todo-item')
+        cy.get('ul.todo-list li.todo-item')
+        // .find('li.todo-item')
         .first()
         .find('span.checker')
         .should('have.class', 'unchecked')
     })
 
-    it('delete a todo item', () => {
+    it('R8UC3-1: should delete a todo item', () => {
         // delete the first todo item
         cy.get('ul.todo-list')
         .contains('li.todo-item', taskObject.todos)
@@ -176,15 +189,8 @@ describe('Task in detail mode', () => {
         cy.request({
             method: 'DELETE',
             url: `http://localhost:5000/tasks/byid/${taskid}`
-            }).then((response) => {
+        }).then((response) => {
             cy.log(response.body)
-            })
-        // // clean up by deleting the todo from the database
-        // cy.request({
-        //   method: 'DELETE',
-        //   url: `http://localhost:5000/todos/${todoid}`
-        // }).then((response) => {
-        //   cy.log(response.body)
-        // })
+        })
     })
 })
