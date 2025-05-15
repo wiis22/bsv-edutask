@@ -28,4 +28,4 @@ jobs:
 
     - name: Run the backend unit tests with pytest
       run: |
-        pytest
+         pytest -v --cov=src --cov-report=term-missing --durations=5 test/
