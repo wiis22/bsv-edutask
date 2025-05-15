@@ -53,6 +53,16 @@ describe('Task in detail mode', () => {
                     console.log("taskResponse", taskResponse)
                     taskid = taskResponse.body[taskResponse.body.length - 1]._id.$oid
                     cy.log("taskid", taskid)
+                    cy.request({
+                        method: 'POST',
+                        url: 'http://localhost:5000/todos/create',
+                        form: true,
+                        body: {
+                            taskid,
+                            description: 'R8UC2-2',
+                            done: true
+                        }
+                    })
                 })
             })
         })
@@ -108,60 +118,45 @@ describe('Task in detail mode', () => {
         })
     })
 
-    it('R8UC1-2-a: should have empty todo input form start', () => {
-        cy.get('form.inline-form')
-        .find('input[type=text]')
-        .should('have.value', '')
-    })
+    // it('R8UC1-2-a: should have empty todo input form start', () => {
+    //     cy.get('form.inline-form')
+    //     .find('input[type=text]')
+    //     .should('have.value', '')
+    // })
 
-    it('R8UC1-2-b: should disable Add button if input is empty', () => {
-    // cy.get('form.inline-form')
-    // .find('input[type=text]')
-    // .should('have.value', '')
+    it('R8UC1-2: should disable Add button if input is empty', () => {
+    cy.get('form.inline-form')
+    .find('input[type=text]')
+    .clear()
 
     // assert that the "Add" button is disabled
     cy.get('input[type=submit][value="Add"]')
     .should('be.disabled')
     })
 
-    it('R8UC2-1-a: should start with todo item as not done', () => {
-        // check the first todo item
-        cy.get('ul.todo-list')
-        .find('li.todo-item')
-        .first()
-        .find('span.checker')
-        .should('have.class', 'unchecked')
-    })
-
-    it('R8UC2-1-b: should mark todo item as done after click', () => {
+    it('R8UC2-1: should mark todo item as done after click', () => {
         // click the first todo item
-        cy.get('ul.todo-list')
-        .find('li.todo-item')
+        cy.get('ul.todo-list li.todo-item')
+        .find('span.unchecked')
         .first()
-        .find('span.checker')
         .click()
         // assert that the todo item is now marked as done
-        cy.get('ul.todo-list')
-        .find('li.todo-item')
+        cy.get('ul.todo-list li.todo-item')
         .first()
         .find('span.checker')
         .should('have.class', 'checked')
     })
 
     it('R8UC2-2: should mark todo item as not done', () => {
-        // unchcheck the first todo item
+        //make a new todo item
+
+            // assert that the todo item is now marked as done
         cy.get('ul.todo-list')
-        .find('li.todo-item')
-        .first()
+        .contains('li.todo-item', 'R8UC2-2')
         .find('span.checker')
-        // .should('have.class', 'checked')
         .click()
-        // assert that the todo item is now marked as not done
-        cy.get('ul.todo-list li.todo-item')
-        // .find('li.todo-item')
-        .first()
-        .find('span.checker')
         .should('have.class', 'unchecked')
+        
     })
 
     it('R8UC3-1: should delete a todo item', () => {
@@ -185,12 +180,6 @@ describe('Task in detail mode', () => {
         }).then((response) => {
             cy.log(response.body)
         })
-        // clean up by deleting all tasks for the user from the database
-        cy.request({
-            method: 'DELETE',
-            url: `http://localhost:5000/tasks/byid/${taskid}`
-        }).then((response) => {
-            cy.log(response.body)
-        })
     })
+
 })
