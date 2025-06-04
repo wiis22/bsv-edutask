@@ -11,9 +11,9 @@ describe('Task in detail mode', () => {
     
     before(function () {
         // create a fabricated user from a fixture
-        cy.fixture('user.json')
+        return cy.fixture('user.json')
         .then((user) => {
-            cy.request({
+            return cy.request({
                 method: 'POST',
                 url: 'http://localhost:5000/users/create',
                 form: true,
@@ -22,46 +22,56 @@ describe('Task in detail mode', () => {
                 uid = userResponse.body._id.$oid
                 name = user.firstName + ' ' + user.lastName
                 email = user.email
-            })
 
-            // create a fabricated task from a fixture
-            cy.fixture('task.json')
-            .then((task) => {
-                taskObject = task
-                task.userid = uid
-                // task.todos = JSON.stringify(task.todos)
-                let taskData = new URLSearchParams();
-                for (const key in task) {
-                    taskData.append(key, task[key]);
-                }
+                return cy.fixture('task.json')
+                .then((task) => {
+                    taskObject = task
+                    task.userid = uid
+                    // task.todos = JSON.stringify(task.todos)
+                    let taskData = new URLSearchParams();
+                    for (const key in task) {
+                        taskData.append(key, task[key]);
+                    }
 
-                taskData = taskData.toString()
+                    taskData = taskData.toString()
 
-                // console.log("taskData", taskData)
-                // cy.log("taskData", taskData)
+                    // console.log("taskData", taskData)
+                    // cy.log("taskData", taskData)
 
-                cy.request({
-                    method: 'POST',
-                    url: 'http://localhost:5000/tasks/create',
-                    json: true,
-                    body: taskData,
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                }).then((taskResponse) => {
-                    cy.log("taskResponse", taskResponse)
-                    console.log("taskResponse", taskResponse)
-                    taskid = taskResponse.body[taskResponse.body.length - 1]._id.$oid
-                    cy.log("taskid", taskid)
-                    cy.request({
+                    return cy.request({
                         method: 'POST',
-                        url: 'http://localhost:5000/todos/create',
-                        form: true,
-                        body: {
-                            taskid,
-                            description: 'R8UC2-2',
-                            done: true
-                        }
+                        url: 'http://localhost:5000/tasks/create',
+                        json: true,
+                        body: taskData,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                    }).then((taskResponse) => {
+                        // cy.log("taskResponse", taskResponse)
+                        // console.log("taskResponse", taskResponse)
+                        taskid = taskResponse.body[taskResponse.body.length - 1]._id.$oid
+                        // cy.log("taskid", taskid)
+                        return cy.request({
+                            method: 'POST',
+                            url: 'http://localhost:5000/todos/create',
+                            form: true,
+                            body: {
+                                taskid,
+                                description: 'R8UC2-1',
+                                done: false
+                            }
+                        }).then(() => {
+                            return cy.request({
+                                method: 'POST',
+                                url: 'http://localhost:5000/todos/create',
+                                form: true,
+                                body: {
+                                    taskid,
+                                    description: 'R8UC2-2',
+                                    done: true
+                                }
+                            })
+                        })
                     })
                 })
             })
@@ -136,27 +146,28 @@ describe('Task in detail mode', () => {
 
     it('R8UC2-1: should mark todo item as done after click', () => {
         // click the first todo item
-        cy.get('ul.todo-list li.todo-item')
-        .find('span.unchecked')
-        .first()
+        cy.get('ul.todo-list')
+        .contains('li.todo-item', 'R8UC2-1')
+        .find('span.checker')
         .click()
         // assert that the todo item is now marked as done
-        cy.get('ul.todo-list li.todo-item')
-        .first()
-        .find('span.checker')
-        .should('have.class', 'checked')
+        cy.contains('ul.todo-list li.todo-item', 'R8UC2-1')
+        .find('span.editable')
+        .should('have.css', 'text-decoration-line', 'line-through')
     })
 
     it('R8UC2-2: should mark todo item as not done', () => {
-        //make a new todo item
-
-            // assert that the todo item is now marked as done
+        // assert that the todo item is now marked as done
+        // change to be done through the api
         cy.get('ul.todo-list')
         .contains('li.todo-item', 'R8UC2-2')
         .find('span.checker')
         .click()
-        .should('have.class', 'unchecked')
-        
+
+        cy.contains('ul.todo-list li.todo-item', 'R8UC2-2')
+        .find('span.editable')
+        .should('have.css', 'text-decoration-line', 'none')
+        // .should('have.class', 'unchecked')
     })
 
     it('R8UC3-1: should delete a todo item', () => {
@@ -165,6 +176,9 @@ describe('Task in detail mode', () => {
         .contains('li.todo-item', taskObject.todos)
         .contains('✖')
         .click()
+        
+
+        
         // assert that the todo item is now deleted
         cy.get('ul.todo-list')
         .contains('li.todo-item', taskObject.todos)
